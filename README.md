@@ -4,7 +4,6 @@
 
 <p>This project works completely <b>without internet</b>, using only GPS satellites and GSM mobile network. It is designed as a beginner-friendly embedded systems project that demonstrates real-world applications of IoT, GPS tracking, and microcontroller communication.</p>
 
----
 
 <h2>1. Project Overview</h2>
 
@@ -17,7 +16,6 @@
   <li>Hardware button triggers emergency mode</li>
 </ul>
 
----
 
 <h2>2. System Features</h2>
 
@@ -32,7 +30,6 @@
   <li>Flash memory storage (no reconfiguration needed)</li>
 </ul>
 
----
 
 <h2>3. How the System Works</h2>
 
@@ -62,7 +59,6 @@
   <li>Status is shown on touchscreen UI</li>
 </ol>
 
----
 
 <h2>4. Hardware Requirements</h2>
 
