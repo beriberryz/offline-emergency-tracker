@@ -69,7 +69,7 @@
   </tr>
   <tr>
     <td>ESP32 Touchscreen Board</td>
-    <td>Main controller + UI system</td>
+    <td>Main controller and UI system</td>
   </tr>
   <tr>
     <td>A9G Module</td>
@@ -84,7 +84,44 @@
     <td>Audio alert system</td>
   </tr>
   <tr>
-    <td>Power Supply</td>
+    <td>Power Supply (battery, boost converter, bms)</td>
     <td>Battery or external charger</td>
   </tr>
 </table>
+
+<h2>5. Wiring Diagram</h2>
+
+<h3>5.1 A9G to ESP32</h3>
+
+<ul>
+  <li>TX → GPIO 16</li>
+  <li>RX → GPIO 17</li>
+  <li>GND → GND</li>
+  <li>VCC → [[4V–5V STABLE SUPPLY]]</li>
+</ul>
+
+<h3>5.2 Emergency Button</h3>
+
+<ul>
+  <li>One pin → GPIO 25</li>
+  <li>Other pin → GND</li>
+</ul>
+
+<h3>5.3 Buzzer</h3>
+
+<ul>
+  <li>+ → GPIO 26</li>
+  <li>- → GND</li>
+</ul>
+
+
+<h2>6. Software Requirements</h2>
+
+<ul>
+  <li>Arduino IDE</li>
+  <li>ESP32 Board Package (Espressif Systems)</li>
+  <li>LVGL Library (UI system)</li>
+  <li>TFT_eSPI Library (display driver)</li>
+</ul>
+
+<p><b>Note:</b> TFT_eSPI must be configured inside User_Setup.h depending on your screen model.</p>
