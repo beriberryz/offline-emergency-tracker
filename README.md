@@ -21,13 +21,10 @@
 
 <ul>
   <li>Touchscreen UI built with LVGL</li>
-  <li>QWERTY on-screen keyboard</li>
-  <li>One-time user setup (name and age)</li>
   <li>Real-time GPS location tracking</li>
   <li>SMS emergency alert with Google Maps link</li>
   <li>Hardware emergency button (instant trigger)</li>
   <li>Buzzer alert system</li>
-  <li>Flash memory storage (no reconfiguration needed)</li>
 </ul>
 
 
@@ -40,7 +37,6 @@
 
 <ul>
   <li>User enters name: [[NAME INPUT]]</li>
-  <li>User enters age: [[AGE INPUT]]</li>
   <li>Data is saved in ESP32 flash memory</li>
 </ul>
 
@@ -89,33 +85,8 @@
   </tr>
 </table>
 
-<h2>5. Wiring Diagram</h2>
 
-<h3>5.1 A9G to ESP32</h3>
-
-<ul>
-  <li>TX → GPIO 16</li>
-  <li>RX → GPIO 17</li>
-  <li>GND → GND</li>
-  <li>VCC → [[4V–5V STABLE SUPPLY]]</li>
-</ul>
-
-<h3>5.2 Emergency Button</h3>
-
-<ul>
-  <li>One pin → GPIO 25</li>
-  <li>Other pin → GND</li>
-</ul>
-
-<h3>5.3 Buzzer</h3>
-
-<ul>
-  <li>+ → GPIO 26</li>
-  <li>- → GND</li>
-</ul>
-
-
-<h2>6. Software Requirements</h2>
+<h2>5. Software Requirements</h2>
 
 <ul>
   <li>Arduino IDE</li>
