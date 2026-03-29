@@ -4,16 +4,12 @@
 TFT_eSPI tft = TFT_eSPI();
 Preferences prefs;
 
-// ============================================================
-//  PIN CONFIGURATION — change these to match your wiring
-// ============================================================
 #define TFT_BL        21
-#define PIN_BUTTON    35   // GPIO for hardware emergency button
-#define PIN_BUZZER    25   // GPIO for buzzer
-#define A9G_TX        17   // ESP32 TX → A9G RX
-#define A9G_RX        16   // ESP32 RX → A9G TX
+#define PIN_BUTTON    35
+#define PIN_BUZZER    25
+#define A9G_TX        17
+#define A9G_RX        16
 #define A9G_BAUD      115200
-// ============================================================
 
 #define SCREEN_W 480
 #define SCREEN_H 320
@@ -23,7 +19,6 @@ Preferences prefs;
 #define TOUCH_Y_MIN 17
 #define TOUCH_Y_MAX 302
 
-// ---------------- SYSTEM STATES ----------------
 enum SystemState {
   STATE_START,
   STATE_REGISTER,
@@ -33,19 +28,16 @@ enum SystemState {
 };
 SystemState sysState = STATE_START;
 
-// ---------------- DATA ----------------
 String userName  = "";
 String nameInput = "";
 bool   firstBoot = true;
 
-// ---------------- GPS / GSM STATUS ----------------
 String gpsStatus = "No Fix";
 String gsmStatus = "No Signal";
 String sysStatus = "Ready";
 float  gpsLat    = 0.0;
 float  gpsLon    = 0.0;
 
-// ---------------- EMERGENCY ----------------
 volatile bool emergencyTriggered = false;
 unsigned long lastButtonPress    = 0;
 bool          buzzerActive       = false;
@@ -53,13 +45,11 @@ unsigned long lastBuzzerToggle   = 0;
 bool          buzzerState        = false;
 bool          stopRequested      = false;
 
-// ---------------- UI ----------------
 bool          needsRedraw   = true;
 bool          cursorVisible = true;
 unsigned long lastTouch     = 0;
 unsigned long lastBlink     = 0;
 
-// ---------------- BUTTON STRUCT ----------------
 struct Button {
   int x, y, w, h;
   String label;
@@ -72,6 +62,8 @@ Button delBtn;
 Button spaceBtn;
 Button signUpBtn;
 Button changeBtn;
+Button sosBtn;
+Button resetBtn;
 Button retryBtn;
 Button stopBtn;
 Button backBtn;
@@ -185,7 +177,6 @@ void drawTextField() {
 // ============================================================
 //  SCREENS
 // ============================================================
-
 void drawStartScreen() {
   tft.fillScreen(TFT_BLACK);
   tft.setTextDatum(MC_DATUM);
@@ -217,47 +208,86 @@ void drawInputScreen() {
 void drawMainScreen() {
   tft.fillScreen(TFT_BLACK);
 
+  // ── Header ──────────────────────────────────────────────
   tft.fillRect(0, 0, SCREEN_W, 45, TFT_NAVY);
   tft.setTextDatum(ML_DATUM);
   tft.setTextColor(TFT_WHITE, TFT_NAVY);
   tft.setTextSize(2);
   tft.drawString("Hi, " + userName, 15, 22);
 
-  tft.drawRoundRect(10, 55, SCREEN_W - 20, 55, 8, TFT_DARKGREY);
+  // Reset button — top-right inside header
+  int resetW = 70, resetH = 31;
+  int resetX = SCREEN_W - resetW - 8;
+  int resetY = 7;
+  resetBtn = {resetX, resetY, resetW, resetH, "Reset"};
+  tft.fillRoundRect(resetX, resetY, resetW, resetH, 6, TFT_RED);
+  tft.drawRoundRect(resetX, resetY, resetW, resetH, 6, TFT_WHITE);
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(TFT_WHITE, TFT_RED);
   tft.setTextSize(1);
+  tft.drawString("Reset", resetX + resetW / 2, resetY + resetH / 2);
 
+  // ── Status box ──────────────────────────────────────────
+  // Box starts at y=52, height=80 — plenty of room for 2 rows
+  int boxX = 10, boxY = 52, boxW = SCREEN_W - 20, boxH = 80;
+  tft.fillRoundRect(boxX + 1, boxY + 1, boxW - 2, boxH - 2, 7, TFT_BLACK); // clear inside
+  tft.drawRoundRect(boxX, boxY, boxW, boxH, 8, TFT_DARKGREY);
+
+  // Use textSize(1) — each char is 6px wide, 8px tall
+  tft.setTextSize(1);
+  tft.setTextDatum(ML_DATUM);
+
+  // Row 1  y=72  — Status value left, GSM value right
+  int row1Y = 72;
   uint16_t sysColor = TFT_GREEN;
   if (sysStatus == "Sending...")  sysColor = TFT_YELLOW;
   if (sysStatus == "Failed")      sysColor = TFT_RED;
-  if (sysStatus == "Sent!")       sysColor = TFT_GREEN;
+
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawString("Status:", 20, 70);
+  tft.drawString("Status:", 25, row1Y);        // label  ~50px wide
   tft.setTextColor(sysColor, TFT_BLACK);
-  tft.drawString(sysStatus, 90, 70);
+  tft.drawString(sysStatus,  90, row1Y);       // value starts at 90
 
-  uint16_t gpsColor = (gpsStatus == "Fix") ? TFT_GREEN : TFT_RED;
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawString("GPS:", 20, 90);
-  tft.setTextColor(gpsColor, TFT_BLACK);
-  tft.drawString(gpsStatus, 90, 90);
-
+  tft.drawString("GSM:", 260, row1Y);          // label
   uint16_t gsmColor = (gsmStatus == "Signal") ? TFT_GREEN : TFT_RED;
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawString("GSM:", 200, 70);
   tft.setTextColor(gsmColor, TFT_BLACK);
-  tft.drawString(gsmStatus, 260, 70);
+  tft.drawString(gsmStatus, 295, row1Y);       // value
 
+  // Row 2  y=96  — GPS
+  int row2Y = 96;
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString("GPS:", 25, row2Y);
+  uint16_t gpsColor = (gpsStatus == "Fix") ? TFT_GREEN : TFT_RED;
+  tft.setTextColor(gpsColor, TFT_BLACK);
+  tft.drawString(gpsStatus, 60, row2Y);
+
+  // ── Hint label ──────────────────────────────────────────
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
   tft.setTextSize(1);
-  tft.drawString("Press hardware button for emergency", SCREEN_W / 2, 130);
+  tft.drawString("Press hardware button or SOS for emergency", SCREEN_W / 2, 148);
 
-  int btnW = 180, btnH = 40;
+  // ── SOS button — pushed well down ───────────────────────
+  int sosBtnW = 160, sosBtnH = 55;
+  int sosBtnX = (SCREEN_W - sosBtnW) / 2;
+  int sosBtnY = 185;
+  sosBtn = {sosBtnX, sosBtnY, sosBtnW, sosBtnH, "SOS"};
+  tft.fillRoundRect(sosBtnX, sosBtnY, sosBtnW, sosBtnH, 10, TFT_RED);
+  tft.drawRoundRect(sosBtnX, sosBtnY, sosBtnW, sosBtnH, 10, TFT_WHITE);
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(TFT_WHITE, TFT_RED);
+  tft.setTextSize(3);
+  tft.drawString("SOS", sosBtnX + sosBtnW / 2, sosBtnY + sosBtnH / 2);
+
+  // ── Change Details button ────────────────────────────────
+  int btnW = 180, btnH = 38;
   int btnX = (SCREEN_W - btnW) / 2;
-  int btnY = SCREEN_H - 60;
+  int btnY = SCREEN_H - 42;
   changeBtn = {btnX, btnY, btnW, btnH, "Change Details"};
   tft.fillRoundRect(btnX, btnY, btnW, btnH, 8, TFT_DARKGREY);
   tft.drawRoundRect(btnX, btnY, btnW, btnH, 8, TFT_WHITE);
+  tft.setTextDatum(MC_DATUM);
   tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
   tft.setTextSize(2);
   tft.drawString("Change Details", btnX + btnW / 2, btnY + btnH / 2);
@@ -335,6 +365,20 @@ void drawEmergencyScreen() {
 }
 
 // ============================================================
+//  STOP BUTTON CHECK — called inside blocking loops
+// ============================================================
+void checkStopTouch() {
+  uint16_t rawX, rawY;
+  if (tft.getTouch(&rawX, &rawY)) {
+    int x = fixX(rawX);
+    int y = fixY(rawY);
+    if (hit(stopBtn, x, y)) {
+      stopRequested = true;
+    }
+  }
+}
+
+// ============================================================
 //  A9G — GPS
 // ============================================================
 void requestGPS() {
@@ -343,6 +387,7 @@ void requestGPS() {
   unsigned long t = millis();
   while (millis() - t < 2000) {
     if (stopRequested) { gpsStatus = "No Fix"; return; }
+    checkStopTouch();
     delay(10);
   }
 
@@ -350,6 +395,7 @@ void requestGPS() {
   t = millis();
   while (millis() - t < 3000) {
     if (stopRequested) { gpsStatus = "No Fix"; return; }
+    checkStopTouch();
     if (Serial2.available()) response += (char)Serial2.read();
     delay(10);
   }
@@ -378,6 +424,7 @@ void checkGSM() {
   unsigned long t = millis();
   while (millis() - t < 1000) {
     if (stopRequested) return;
+    checkStopTouch();
     delay(10);
   }
 
@@ -385,6 +432,7 @@ void checkGSM() {
   t = millis();
   while (millis() - t < 2000) {
     if (stopRequested) return;
+    checkStopTouch();
     if (Serial2.available()) response += (char)Serial2.read();
     delay(10);
   }
@@ -402,11 +450,7 @@ void checkGSM() {
 //  A9G — SMS
 // ============================================================
 void sendSMS() {
-  // ============================================================
-  //  EMERGENCY CONTACT — change this to your recipient number
-  // ============================================================
   String contactNumber = "+639XXXXXXXXX";  // <-- put number here
-  // ============================================================
 
   if (stopRequested) { sysStatus = "Failed"; return; }
 
@@ -422,6 +466,7 @@ void sendSMS() {
   unsigned long t = millis();
   while (millis() - t < 500) {
     if (stopRequested) { sysStatus = "Failed"; return; }
+    checkStopTouch();
     delay(10);
   }
 
@@ -430,6 +475,7 @@ void sendSMS() {
   t = millis();
   while (millis() - t < 500) {
     if (stopRequested) { sysStatus = "Failed"; return; }
+    checkStopTouch();
     delay(10);
   }
 
@@ -440,6 +486,7 @@ void sendSMS() {
   t = millis();
   while (millis() - t < 5000) {
     if (stopRequested) { sysStatus = "Failed"; return; }
+    checkStopTouch();
     if (Serial2.available()) response += (char)Serial2.read();
     delay(10);
   }
@@ -493,6 +540,15 @@ void loadData() {
   prefs.end();
 }
 
+void resetData() {
+  prefs.begin("userdata", false);
+  prefs.clear();
+  prefs.end();
+  userName  = "";
+  nameInput = "";
+  firstBoot = true;
+}
+
 // ============================================================
 //  EMERGENCY FLOW
 // ============================================================
@@ -508,7 +564,6 @@ void runEmergency() {
   if (!stopRequested) checkGSM();
   if (!stopRequested) sendSMS();
 
-  // If stop was pressed at any point go straight back to main
   if (stopRequested) {
     buzzerActive = false;
     digitalWrite(PIN_BUZZER, LOW);
@@ -530,7 +585,6 @@ void handleTouch(int x, int y) {
   if (millis() - lastTouch < 180) return;
   lastTouch = millis();
 
-  // START SCREEN
   if (sysState == STATE_START) {
     if (hit(signUpBtn, x, y)) {
       nameInput   = "";
@@ -540,7 +594,6 @@ void handleTouch(int x, int y) {
     return;
   }
 
-  // REGISTER or CHANGE SCREEN
   if (sysState == STATE_REGISTER || sysState == STATE_CHANGE) {
     if (hit(enterBtn, x, y)) {
       if (nameInput.length() > 0) {
@@ -578,17 +631,26 @@ void handleTouch(int x, int y) {
     return;
   }
 
-  // MAIN SCREEN
   if (sysState == STATE_MAIN) {
+    if (hit(sosBtn, x, y)) {
+      runEmergency();
+      return;
+    }
     if (hit(changeBtn, x, y)) {
       nameInput   = userName;
       sysState    = STATE_CHANGE;
       needsRedraw = true;
+      return;
+    }
+    if (hit(resetBtn, x, y)) {
+      resetData();
+      sysState    = STATE_START;
+      needsRedraw = true;
+      return;
     }
     return;
   }
 
-  // EMERGENCY SCREEN
   if (sysState == STATE_EMERGENCY) {
     if (sysStatus == "Failed") {
       if (hit(retryBtn, x, y)) {
@@ -648,7 +710,6 @@ void updateCursor() {
 // ============================================================
 void setup() {
   Serial.begin(115200);
-
   Serial2.begin(A9G_BAUD, SERIAL_8N1, A9G_RX, A9G_TX);
 
   pinMode(PIN_BUZZER, OUTPUT);
@@ -687,16 +748,7 @@ void loop() {
   if (tft.getTouch(&rawX, &rawY)) {
     int x = fixX(rawX);
     int y = fixY(rawY);
-
-    // During emergency sending, check stop button directly
-    // so it can interrupt the blocking flow
-    if (sysState == STATE_EMERGENCY && sysStatus == "Sending...") {
-      if (hit(stopBtn, x, y)) {
-        stopRequested = true;
-      }
-    } else {
-      handleTouch(x, y);
-    }
+    handleTouch(x, y);
   }
 
   updateBuzzer();
