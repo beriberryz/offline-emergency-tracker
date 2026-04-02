@@ -173,8 +173,6 @@ void loop() {
 
       String message;
 
-      String message;
-
       String coords = latestLocation;
       coords.trim();
 
