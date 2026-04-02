@@ -66,15 +66,11 @@
   </tr>
   <tr>
     <td>Fast blinking</td>
-    <td>Searching for GPS signal</td>
+    <td>Searching for GPS/GSM signal</td>
   </tr>
   <tr>
     <td>Slow blinking</td>
-    <td>GPS locked and stable</td>
-  </tr>
-  <tr>
-    <td>Solid ON</td>
-    <td>Emergency mode active (button pressed)</td>
+    <td>GPS/GSM locked and stable</td>
   </tr>
   <tr>
     <td>OFF</td>
