@@ -113,7 +113,7 @@
 <p><b>Insert pinout diagram below:</b></p>
 
 <pre>
-[ PLACE YOUR PINOUT IMAGE HERE ]
+[ PINOUT IMAGE WILL BE INSERTED HERE SOON ]
 </pre>
 
 <ul>
