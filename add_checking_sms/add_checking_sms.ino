@@ -64,19 +64,19 @@ void checkIncomingSMS() {
 
     Serial.println("Incoming SMS detected");
 
-    // Extract number
+    // extract the number
     int firstQuote = line.indexOf('"');
     int secondQuote = line.indexOf('"', firstQuote + 1);
     String sender = line.substring(firstQuote + 1, secondQuote);
 
-    // Next line = message body
+    // basahin ano yung sinend
     String message = readLine(1000);
     message.trim();
 
     Serial.println("From: " + sender);
     Serial.println("Msg: " + message);
 
-    // NOT CASE SENSITIVE
+    // para hindi case sensitive
     message = toLowerCaseStr(message);
 
     if (message == "send location") {
@@ -209,7 +209,6 @@ void setup() {
 }
 
 
-// ================= LOOP =================
 void loop() {
 
   // checking for incoming sms
