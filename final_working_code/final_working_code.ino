@@ -171,9 +171,17 @@ void loop() {
       String message;
 
       if (latestLocation.length() > 0) {
-        message = "TULONG! " + latestLocation;
+        message =     
+          "Help! I'm in danger.\n\n"
+          "Name: Carl Michael Manlupig\n"
+          "Age: 17\n\n"
+          "Location: https://maps.google.com/?q=" + latestLocation;
       } else {
-        message = "TULONG! Location unavailable.";
+        message = 
+          "Help! I'm in danger.\n\n"
+          "Name: Carl Michael Manlupig\n"
+          "Age: 17\n\n"
+          "Location: Not available";
       }
 
       sendSMS("09560253860", message);
