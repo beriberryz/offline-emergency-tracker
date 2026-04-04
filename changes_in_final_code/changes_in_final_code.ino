@@ -182,7 +182,7 @@ void loop() {
           "Help! I'm in danger.\n\n"
           "Name: Carl Michael Manlupig\n"
           "Age: 17\n\n"
-          "Location: https://maps.google.com/?q=" + coords;
+          "Location: " + coords;
 
       } else {
 
