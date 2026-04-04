@@ -169,112 +169,29 @@ void loop() {
       updateGPS();
 
       String message;
-
-      if (gotFix && latestLocation.length() > 10) {
-        message = "Help! I'm in danger.\r\n";
-        message += "Name: Carl Michael Manlupig\r\n";
-        message += "Age: 17\r\n";
-        message += "maps.google.com/?q=";
-        message += latestLocation;
-      } else {
-        message = "Help! I'm in danger.\r\n";
-        message += "Name: Carl Michael Manlupig\r\n";
-        message += "Age: 17\r\n";
-        message += "Location: Not available";
-      }
+        String coords = latestLocation;
+        coords.trim();
+        
+        if (coords.length() > 10 && coords.indexOf(',') != -1) {  // ← replace gotFix check
+          message = "Help! I'm in danger.\r\n";
+          message += "Name: Carl Michael Manlupig\r\n";
+          message += "Age: 17\r\n";
+          message += "maps.google.com/?q=";
+          message += coords;
+        } else {
+          message = "Help! I'm in danger.\r\n";
+          message += "Name: Carl Michael Manlupig\r\n";
+          message += "Age: 17\r\n";
+          message += "Location: Not available";
+        }
 
       sendSMS("09560253860", message);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(200);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(200);
+           for (int i = 0; i < 20; i++) {
+        digitalWrite(BUZZER_PIN, HIGH);
+        delay(200);
+        digitalWrite(BUZZER_PIN, LOW);
+        delay(200);
+      }
 
       while (digitalRead(BUTTON_PIN) == LOW);
       delay(1000);
