@@ -170,18 +170,17 @@ void loop() {
 
       String message;
 
-      if (latestLocation.length() > 0) {
-        message =     
-          "Help! I'm in danger.\n\n"
-          "Name: Carl Michael Manlupig\n"
-          "Age: 17\n\n"
-          "Location: https://maps.google.com/?q=" + latestLocation;
+      if (gotFix && latestLocation.length() > 10) {
+        message = "Help! I'm in danger.\r\n";
+        message += "Name: Carl Michael Manlupig\r\n";
+        message += "Age: 17\r\n";
+        message += "maps.google.com/?q=";
+        message += latestLocation;
       } else {
-        message = 
-          "Help! I'm in danger.\n\n"
-          "Name: Carl Michael Manlupig\n"
-          "Age: 17\n\n"
-          "Location: Not available";
+        message = "Help! I'm in danger.\r\n";
+        message += "Name: Carl Michael Manlupig\r\n";
+        message += "Age: 17\r\n";
+        message += "Location: Not available";
       }
 
       sendSMS("09560253860", message);
